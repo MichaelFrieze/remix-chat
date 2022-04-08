@@ -1,7 +1,3 @@
 export default function Index() {
-  return (
-    <div>
-      <h1>Hello World</h1>
-    </div>
-  );
+  return <h1>Hello, Level Up Tutorials!</h1>;
 }
