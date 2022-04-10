@@ -1,8 +1,17 @@
-import channels from "~/data/channels.json";
-import { useLoaderData } from "remix";
+import { useLoaderData } from 'remix';
+import supabase from '~/utils/supabase';
 
-export const loader = ({ params: { id } }) => {
-  const channel = channels.find((c) => c.id === id);
+export const loader = async ({ params: { id } }) => {
+  const { data: channel, error } = await supabase
+    .from('channels')
+    .select('title, description, messages(id, content)')
+    .match({ id })
+    .single();
+
+  if (error) {
+    console.log(error.message);
+  }
+
   return {
     channel,
   };

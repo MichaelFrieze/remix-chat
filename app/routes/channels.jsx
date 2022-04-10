@@ -1,7 +1,15 @@
 import { useLoaderData, Link, Outlet } from 'remix';
-import channels from '~/data/channels.json';
+import supabase from '~/utils/supabase';
 
 export const loader = async () => {
+  const { data: channels, error } = await supabase
+    .from('channels')
+    .select('id, title');
+
+  if (error) {
+    console.error(error.message);
+  }
+
   return {
     channels,
   };
