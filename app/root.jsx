@@ -35,7 +35,7 @@ export default function App() {
       <body>
         <Outlet />
         <script
-          dangerouselysetinnerhtml={{
+          dangerouslySetInnerHTML={{
             __html: `window.env = ${JSON.stringify(env)}`,
           }}
         />

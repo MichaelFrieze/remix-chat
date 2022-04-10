@@ -7,7 +7,7 @@ export const loader = async () => {
     .select('id, title');
 
   if (error) {
-    console.error(error.message);
+    console.log(error.message);
   }
 
   return {
@@ -17,6 +17,7 @@ export const loader = async () => {
 
 export default () => {
   const { channels } = useLoaderData();
+
   return (
     <div>
       {channels.map((channel) => (
