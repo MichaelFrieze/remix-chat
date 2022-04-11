@@ -10,7 +10,7 @@ export const loader = async ({ request, params: { id } }) => {
   const { data: channel, error } = await supabase
     .from('channels')
     .select(
-      'id, title, description, messages(id, content, profiles(email, username))'
+      'id, title, description, messages(id, content, likes, profiles(email, username))'
     )
     .match({ id })
     .single();
@@ -67,6 +67,15 @@ export default () => {
     setMessages([...channel.messages]);
   }, [channel]);
 
+  const handleIncrement = (id) => async () => {
+    // call increment function from postgres!
+    const { data, error } = await supabase.rpc('increment_likes', {
+      message_id: id,
+    });
+
+    console.log({ data, error });
+  };
+
   return (
     <>
       <h1 className="text-2xl uppercase mb-2">{channel.title}</h1>
@@ -80,6 +89,10 @@ export default () => {
               {message.content}
               <span className="block text-xs text-gray-500 px-2">
                 {message.profiles.username ?? message.profiles.email}
+              </span>
+              <span className="block text-xs text-gray-500 px-2">
+                {message.likes} likes{' '}
+                <button onClick={handleIncrement(message.id)}>👍</button>
               </span>
             </p>
           ))}
