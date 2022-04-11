@@ -1,13 +1,13 @@
-import supabase from "~/utils/supabase";
-import { Link } from "remix";
+import supabase from '~/utils/supabase';
+import { Link } from 'remix';
 
 export default () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    const email = formData.get('email');
+    const password = formData.get('password');
 
     console.log({ email, password });
 

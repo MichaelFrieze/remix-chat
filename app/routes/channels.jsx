@@ -1,13 +1,16 @@
 import { useLoaderData, Link, Outlet } from 'remix';
 import supabase from '~/utils/supabase';
-import { useEffect } from 'react';
+import { getSession } from '~/utils/cookie';
 
-export const loader = async () => {
+export const loader = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
+  const accessToken = session.get('accessToken');
+
+  supabase.auth.setAuth(accessToken);
+
   const { data: channels, error } = await supabase
     .from('channels')
     .select('id, title');
-
-  console.log({ channels });
 
   if (error) {
     console.log(error.message);
@@ -20,20 +23,6 @@ export const loader = async () => {
 
 export default () => {
   const { channels } = useLoaderData();
-
-  useEffect(() => {
-    const getChannels = async () => {
-      const { data: channels, error } = await supabase
-        .from('channels')
-        .select('*');
-
-      console.log({ channels });
-    };
-
-    getChannels();
-  }, []);
-
-  console.log(supabase.auth.user());
 
   return (
     <div className="h-screen flex">
