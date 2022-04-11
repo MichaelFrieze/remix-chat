@@ -21,7 +21,7 @@ export default () => {
   return (
     <div>
       {channels.map((channel) => (
-        <p key={channel.id}>
+        <p key={channel.id} className="text-3xl">
           <Link to={`/channels/${channel.id}`}>{channel.title}</Link>
         </p>
       ))}

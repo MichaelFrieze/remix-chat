@@ -8,11 +8,17 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 
+import styles from '~/styles/app.css';
+
 export const meta = () => ({
   charset: 'utf-8',
   title: 'New Remix App',
   viewport: 'width=device-width,initial-scale=1',
 });
+
+export function links() {
+  return [{ rel: 'stylesheet', href: styles }];
+}
 
 export const loader = () => {
   return {
