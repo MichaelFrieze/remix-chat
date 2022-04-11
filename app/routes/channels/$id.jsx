@@ -1,5 +1,6 @@
-import { useLoaderData, Form } from 'remix';
+import { useLoaderData, Form, useFetcher } from 'remix';
 import supabase from '~/utils/supabase';
+import { useEffect, useState } from 'react';
 
 export const loader = async ({ params: { id } }) => {
   const { data: channel, error } = await supabase
@@ -33,10 +34,33 @@ export const action = async ({ request }) => {
 
 export default () => {
   const { channel } = useLoaderData();
+  const [messages, setMessages] = useState([...channel.messages]);
+  const fetcher = useFetcher();
+
+  useEffect(() => {
+    supabase
+      .from(`messages:channel_id=eq.${channel.id}`)
+      .on('*', (payload) => {
+        // something changed
+        // call the loader
+        fetcher.load(`/channels/${channel.id}`);
+      })
+      .subscribe();
+  }, []);
+
+  useEffect(() => {
+    if (fetcher.data) {
+      setMessages([...fetcher.data.channel.messages]);
+    }
+  }, [fetcher.data]);
+
+  useEffect(() => {
+    setMessages([...channel.messages]);
+  }, [channel]);
 
   return (
     <div>
-      <pre>{JSON.stringify(channel, null, 2)}</pre>
+      <pre>{JSON.stringify(messages, null, 2)}</pre>
       <Form method="post">
         <input name="content" />
         <input type="hidden" name="channelId" value={channel.id} />
