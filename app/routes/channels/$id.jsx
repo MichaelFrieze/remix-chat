@@ -1,8 +1,12 @@
 import { useLoaderData, Form, useFetcher } from 'remix';
 import supabase from '~/utils/supabase';
 import { useEffect, useState } from 'react';
+import withAuthRequired from '~/utils/withAuthRequired';
 
-export const loader = async ({ params: { id } }) => {
+export const loader = async ({ request, params: { id } }) => {
+  const { supabase, redirect } = await withAuthRequired({ request });
+  if (redirect) return redirect;
+
   const { data: channel, error } = await supabase
     .from('channels')
     .select('id, title, description, messages(id, content)')
@@ -12,16 +16,19 @@ export const loader = async ({ params: { id } }) => {
   if (error) {
     console.log(error.message);
   }
-
   return {
     channel,
   };
 };
 
 export const action = async ({ request }) => {
+  const { supabase, redirect } = await withAuthRequired({ request });
+  if (redirect) return redirect;
+
   const formData = await request.formData();
   const content = formData.get('content');
   const channelId = formData.get('channelId');
+
   const { error } = await supabase
     .from('messages')
     .insert({ content, channel_id: channelId });

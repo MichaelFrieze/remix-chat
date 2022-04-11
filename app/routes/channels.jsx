@@ -1,23 +1,16 @@
 import { useLoaderData, Link, Outlet } from 'remix';
-import supabase from '~/utils/supabase';
-import { getSession } from '~/utils/cookie';
+import withAuthRequired from '~/utils/withAuthRequired';
 
 export const loader = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  const accessToken = session.get('accessToken');
+  const { supabase, redirect } = await withAuthRequired({ request });
+  if (redirect) return redirect;
 
-  supabase.auth.setAuth(accessToken);
-
-  const { data: channels, error } = await supabase
-    .from('channels')
-    .select('id, title');
-
+  const { data, error } = await supabase.from('channels').select('id, title');
   if (error) {
     console.log(error.message);
   }
-
   return {
-    channels,
+    channels: data,
   };
 };
 
