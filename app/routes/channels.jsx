@@ -1,10 +1,13 @@
 import { useLoaderData, Link, Outlet } from 'remix';
 import supabase from '~/utils/supabase';
+import { useEffect } from 'react';
 
 export const loader = async () => {
   const { data: channels, error } = await supabase
     .from('channels')
     .select('id, title');
+
+  console.log({ channels });
 
   if (error) {
     console.log(error.message);
@@ -17,6 +20,18 @@ export const loader = async () => {
 
 export default () => {
   const { channels } = useLoaderData();
+
+  useEffect(() => {
+    const getChannels = async () => {
+      const { data: channels, error } = await supabase
+        .from('channels')
+        .select('*');
+
+      console.log({ channels });
+    };
+
+    getChannels();
+  }, []);
 
   console.log(supabase.auth.user());
 
