@@ -9,7 +9,9 @@ export const loader = async ({ request, params: { id } }) => {
 
   const { data: channel, error } = await supabase
     .from('channels')
-    .select('id, title, description, messages(id, content, profiles(*))')
+    .select(
+      'id, title, description, messages(id, content, profiles(email, username))'
+    )
     .match({ id })
     .single();
 
@@ -22,7 +24,7 @@ export const loader = async ({ request, params: { id } }) => {
 };
 
 export const action = async ({ request }) => {
-  const { supabase, redirect } = await withAuthRequired({ request });
+  const { supabase, redirect, user } = await withAuthRequired({ request });
   if (redirect) return redirect;
 
   const formData = await request.formData();
@@ -31,7 +33,7 @@ export const action = async ({ request }) => {
 
   const { error } = await supabase
     .from('messages')
-    .insert({ content, channel_id: channelId });
+    .insert({ content, channel_id: channelId, user_id: user.id });
   if (error) {
     console.log(error.message);
   }
@@ -76,6 +78,9 @@ export default () => {
           {messages.map((message) => (
             <p key={message.id} className="p-2">
               {message.content}
+              <span className="block text-xs text-gray-500 px-2">
+                {message.profiles.username ?? message.profiles.email}
+              </span>
             </p>
           ))}
         </div>
