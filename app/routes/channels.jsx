@@ -1,4 +1,4 @@
-import { useLoaderData, Link, Outlet } from 'remix';
+import { useLoaderData, Link, Outlet, useLocation } from 'remix';
 import withAuthRequired from '~/utils/withAuthRequired';
 
 export const loader = async ({ request }) => {
@@ -6,9 +6,11 @@ export const loader = async ({ request }) => {
   if (redirect) return redirect;
 
   const { data, error } = await supabase.from('channels').select('id, title');
+
   if (error) {
     console.log(error.message);
   }
+
   return {
     channels: data,
   };
@@ -16,6 +18,7 @@ export const loader = async ({ request }) => {
 
 export default () => {
   const { channels } = useLoaderData();
+  const location = useLocation();
 
   return (
     <div className="h-screen flex">
@@ -30,6 +33,12 @@ export default () => {
         ))}
       </div>
       <div className="flex-1 p-8 flex flex-col">
+        {location.pathname === '/channels' ||
+        location.pathname === '/channels/' ? (
+          <div className="flex-1 flex items-center justify-center text-center">
+            👈 Choose a channel!
+          </div>
+        ) : null}
         <Outlet />
       </div>
     </div>
